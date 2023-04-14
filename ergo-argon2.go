@@ -50,7 +50,7 @@ func HashPassword(password string) string {
 }
 
 func (h *hashType) toString() string {
-	return fmt.Sprintf("$argon2id$v=%02d$m=%02d,t=%02d,p=%02d$%s$%s", version, h.memoryCost, h.timeCost, h.parallelism, h.salt, h.hash)
+	return fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", version, h.memoryCost, h.timeCost, h.parallelism, h.salt, h.hash)
 }
 
 func parseHash(hash string) (hashType, error) {
