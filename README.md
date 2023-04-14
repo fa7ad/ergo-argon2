@@ -1,4 +1,6 @@
 # ergo-argon2
+[![CodeQL](https://github.com/fa7ad/ergo-argon2/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/fa7ad/ergo-argon2/actions/workflows/github-code-scanning/codeql)
+
 Simple wrapper around the standard implementation of [*Argon2id*](https://github.com/P-H-C/phc-winner-argon2) to make hashing and verifying passwords easier.
 
 ## Motivation
