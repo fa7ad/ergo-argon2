@@ -3,6 +3,7 @@ package ergoArgon2
 import (
 	"bytes"
 	"crypto/rand"
+	"crypto/subtle"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -117,5 +118,7 @@ func VerifyPassword(password string, hash string) bool {
 
 	newID := argon2.IDKey([]byte(password), salt, h.timeCost, h.memoryCost, h.parallelism, keyLength)
 
-	return bytes.Equal(ID, newID)
+	isEqual := subtle.ConstantTimeCompare(ID, newID)
+
+	return isEqual == 1
 }
