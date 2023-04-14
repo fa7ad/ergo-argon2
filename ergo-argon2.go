@@ -21,7 +21,7 @@ const (
 	version     = 0x13
 )
 
-type Hash struct {
+type hashType struct {
 	salt        []byte
 	hash        []byte
 	timeCost    uint32
@@ -37,7 +37,7 @@ func HashPassword(password string) string {
 	}
 	ID := argon2.IDKey([]byte(password), salt, timeCost, memoryCost, parallelism, keyLength)
 
-	hash := Hash{
+	hash := hashType{
 		salt:        []byte(base64.RawStdEncoding.EncodeToString(salt)),
 		hash:        []byte(base64.RawStdEncoding.EncodeToString(ID)),
 		timeCost:    timeCost,
@@ -45,49 +45,49 @@ func HashPassword(password string) string {
 		parallelism: parallelism,
 	}
 
-	return hash.String()
+	return hash.toString()
 }
 
-func (h *Hash) String() string {
+func (h *hashType) toString() string {
 	return fmt.Sprintf("$argon2id$v=%02d$m=%02d,t=%02d,p=%02d$%s$%s", version, h.memoryCost, h.timeCost, h.parallelism, h.salt, h.hash)
 }
 
-func parseHash(hash string) (Hash, error) {
+func parseHash(hash string) (hashType, error) {
 	// parse phc-string-formatted hash
 	// $argon2id$v=19$m=65536,t=3,p=4$YXNkZmFzZGxmbnNkYWZoYXNkZg$YXNkZmFzZGxmbnNkYWZoYXNkZg
 	// split on '$'
 	parts := bytes.Split([]byte(hash), []byte{'$'})
 	invalidHashErr := errors.New("invalid hash")
 	if len(parts) != 6 {
-		return Hash{}, invalidHashErr
+		return hashType{}, invalidHashErr
 	}
 	// check algorithm
 	if string(parts[1]) != "argon2id" {
-		return Hash{}, invalidHashErr
+		return hashType{}, invalidHashErr
 	}
 	// check version
 	if string(parts[2]) != "v=19" {
-		return Hash{}, invalidHashErr
+		return hashType{}, invalidHashErr
 	}
 	// split parameters
 	params := bytes.Split(parts[3], []byte{','})
 	if len(params) != 3 {
-		return Hash{}, invalidHashErr
+		return hashType{}, invalidHashErr
 	}
 	// get m, t, p
 	memoryCost, err := strconv.ParseUint(string(params[0][2:]), 10, 32)
 	if err != nil {
-		return Hash{}, invalidHashErr
+		return hashType{}, invalidHashErr
 	}
 	timeCost, err := strconv.ParseUint(string(params[1][2:]), 10, 32)
 	if err != nil {
-		return Hash{}, invalidHashErr
+		return hashType{}, invalidHashErr
 	}
 	parallelism, err := strconv.ParseUint(string(params[2][2:]), 10, 8)
 	if err != nil {
-		return Hash{}, invalidHashErr
+		return hashType{}, invalidHashErr
 	}
-	return Hash{
+	return hashType{
 		salt:        parts[4],
 		hash:        parts[5],
 		timeCost:    uint32(timeCost),
